@@ -9,12 +9,28 @@ var http = require('http');
 var path = require('path');
 var MongoStore = require('connect-mongo')(express);
 var settings = require('./settings');
+var flash = require('connect-flash')
 var app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.use(flash());
+app.use(function(req, res, next){  
+	res.locals.user = req.session.user;
+	var err = req.flash('error');  
+	if(err.length)   
+	   res.locals.error = err; 
+	else  
+	   res.locals.error = null; 
+	var succ = req.flash('success'); 
+	if(succ.length)   
+	  res.locals.success = succ;  
+	else   
+	 res.locals.success = null; 
+ 	next();
+});
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
